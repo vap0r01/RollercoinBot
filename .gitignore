@@ -2,3 +2,5 @@ venv/
 
 # Pycharm config
 .idea/
+
+imgs/*

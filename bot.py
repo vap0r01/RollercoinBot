@@ -5,6 +5,7 @@ import time
 import cv2
 import keyboard
 import mouse
+import shutil
 from PIL import ImageGrab
 
 GAME_NUM = 0
@@ -20,8 +21,6 @@ def screen_grab():
 def find_image(image_path, root_image_path):
     image = cv2.imread(image_path)
     root_image = cv2.imread(root_image_path)
-    os.remove(image_path)
-    os.remove(root_image_path)
     method = [cv2.TM_SQDIFF_NORMED, cv2.TM_CCOEFF][0]
     result = cv2.matchTemplate(image, root_image, method)
     mn, _, mnLoc, _ = cv2.minMaxLoc(result)
@@ -55,11 +54,11 @@ def click_image(img):
 def start_game():
     start_img_path = "rc_items/2048_gameimg.png"
     while not check_image("rc_items/2048_gameimg.png"):
-        time.sleep(2)
+        time.sleep(5)
     click_image(start_img_path)
 
     while not check_image("rc_items/start_game.png"):
-        time.sleep(0.5)
+        time.sleep(1)
     sx, sy = find_image("rc_items/start_game.png", screen_grab())
     mpos = mouse.get_position()
     mouse.drag(mpos[0], mpos[1], sx + 2, sy + 2, absolute=True, duration=0)
@@ -82,32 +81,33 @@ def end_game():
     keyboard.press_and_release("page up")
 
     while not check_image("rc_items/choose_game.png") or check_image("rc_items/collect_pc.png"):
-        time.sleep(1)
+        time.sleep(4)
     if check_image("rc_items/collect_pc.png"):
         click_image("rc_items/collect_pc.png")
         print("PC upgraded!")
-        time.sleep(1)
+        time.sleep(2)
     while check_image("rc_items/choose_game.png"):
         click_image("rc_items/choose_game.png")
-        time.sleep(0.1)
+        time.sleep(2)
 
 
 def main():
     global GAME_NUM
     GAME_NUM += 1
-    print("Game #{!s}:\t".format(GAME_NUM), end="")
-    print("\tSTART...", end="")
+    print("Game #{!s}".format(GAME_NUM))
     start_game()
-    print("RUN...", end="")
     run_game()
-    print("END!")
     end_game()
     time.sleep(30)
 
 
 try:
+    os.mkdir('imgs')
     while True:
         main()
 
 except KeyboardInterrupt:
     pass
+
+finally:
+    shutil.rmtree('imgs')
