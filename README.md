@@ -18,6 +18,7 @@ More will be added later
 - Download or clone the git
 - Python 3.6+ needs to be installed
 - Install all the requirements ```pip install -r requirements.txt```
+- Open up rollercoin.com/game/choose_game on your main monitor
 - Start the script ```python bot.py```
 
 
