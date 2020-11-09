@@ -98,11 +98,14 @@ def main():
     start_game()
     run_game()
     end_game()
-    time.sleep(30)
+    time.sleep(20)
 
 
 try:
-    os.mkdir('imgs')
+    try:
+        os.mkdir('imgs')
+    except FileExistsError:
+        print("Program was not correctly closed last time...")
     while True:
         main()
 

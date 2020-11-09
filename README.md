@@ -14,6 +14,12 @@ I'm also not responsible if you get blocked by Rollercoin!
 
 More will be added later
 
+## Installation
+- Download or clone the git
+- Python 3.6+ needs to be installed
+- Install all the requirements ```pip install -r requirements.txt```
+- Start the script ```python bot.py```
+
 
 ## Bugs
 - Sometimes it breaks after playing a game
