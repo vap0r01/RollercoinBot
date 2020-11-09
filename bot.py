@@ -1,6 +1,7 @@
 import os
 import random
 import time
+import datetime
 
 import cv2
 import keyboard
@@ -9,6 +10,7 @@ import shutil
 from PIL import ImageGrab
 
 GAME_NUM = 0
+START_TIME = datetime.datetime.now()
 
 
 def screen_grab():
@@ -32,7 +34,6 @@ def find_image(image_path, root_image_path):
 
 def check_image(img):
     b, _ = find_image(img, screen_grab())
-
     return True if b is not None else False
 
 
@@ -51,9 +52,15 @@ def click_image(img):
     mouse.click("left")
 
 
-def start_game():
-    start_img_path = "rc_items/2048_gameimg.png"
-    while not check_image("rc_items/2048_gameimg.png"):
+def setup():
+    try:
+        os.mkdir('imgs')
+    except FileExistsError:
+        print("Program was not correctly closed last time. Make sure to exit the game with CTRL+C")
+
+
+def start_game(start_img_path):
+    while not check_image(start_img_path):
         time.sleep(5)
     click_image(start_img_path)
 
@@ -63,14 +70,11 @@ def start_game():
     mpos = mouse.get_position()
     mouse.drag(mpos[0], mpos[1], sx + 2, sy + 2, absolute=True, duration=0)
     mouse.click("left")
+    time.sleep(3)
 
 
-def run_game():
-    while not check_image("rc_items/gain_power.png"):
-        for _ in range(10):
-            keys = ["right", "left", "up", "down"]
-            keyboard.press_and_release(random.choice(keys))
-            time.sleep(0.1)
+def start_game_msg(name):
+    print("Starting Game #{!s}: '{}'@{!s}".format(GAME_NUM, name, datetime.datetime.now().time()))
 
 
 def end_game():
@@ -91,26 +95,49 @@ def end_game():
         time.sleep(2)
 
 
+class Bot2048:
+    def __init__(self):
+        self.start_img_path = "rc_items/2048_gameimg.png"
+        self.available_moves = ["right", "left", "up", "down"]
+        self.game = "2048"
+
+    def gameloop(self):
+        start_game(self.start_img_path)
+        start_game_msg(self.game)
+        self.run_game()
+        end_game()
+
+    def run_game(self):
+        while not check_image("rc_items/gain_power.png"):
+            for _ in range(4):
+                keyboard.press_and_release(random.choice(self.available_moves))
+                time.sleep(0.25)
+
+
 def main():
     global GAME_NUM
-    GAME_NUM += 1
-    print("Game #{!s}".format(GAME_NUM))
-    start_game()
-    run_game()
-    end_game()
-    time.sleep(20)
-
-
-try:
-    try:
-        os.mkdir('imgs')
-    except FileExistsError:
-        print("Program was not correctly closed last time...")
     while True:
+        GAME_NUM += 1
+        Bot2048().gameloop()
+        time.sleep(20)
+
+
+if __name__ == "__main__":
+    setup()
+
+    try:
         main()
 
-except KeyboardInterrupt:
-    pass
+    except KeyboardInterrupt:
+        print("Program closed by User!")
 
-finally:
-    shutil.rmtree('imgs')
+    except Exception as e:
+        print("An Error occured. Stopping the code...")
+        print(e)
+
+    finally:
+        print("\nStatistics:\n",
+              "Time running: {!s}\n".format(datetime.datetime.now()-START_TIME),
+              "Played Games:  {!s}\n".format(GAME_NUM)
+              )
+        shutil.rmtree('imgs')
