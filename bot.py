@@ -70,6 +70,11 @@ def start_game(start_img_path):
     mpos = mouse.get_position()
     mouse.drag(mpos[0], mpos[1], sx + 2, sy + 2, absolute=True, duration=0)
     mouse.click("left")
+    time.sleep(3)
+
+
+def start_game_msg(name):
+    print("Starting Game #{!s}: '{}'@{!s}".format(GAME_NUM, name, datetime.datetime.now().time()))
 
 
 def end_game():
@@ -94,17 +99,19 @@ class Bot2048:
     def __init__(self):
         self.start_img_path = "rc_items/2048_gameimg.png"
         self.available_moves = ["right", "left", "up", "down"]
+        self.game = "2048"
 
     def gameloop(self):
         start_game(self.start_img_path)
+        start_game_msg(self.game)
         self.run_game()
         end_game()
 
     def run_game(self):
         while not check_image("rc_items/gain_power.png"):
-            for _ in range(10):
+            for _ in range(4):
                 keyboard.press_and_release(random.choice(self.available_moves))
-                time.sleep(0.1)
+                time.sleep(0.25)
 
 
 def main():
@@ -123,8 +130,14 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("Program closed by User!")
-        print("Statistics:",
-              "Running since: {!s}".format(START_TIME))
+
+    except Exception as e:
+        print("An Error occured. Stopping the code...")
+        print(e)
 
     finally:
+        print("\nStatistics:\n",
+              "Time running: {!s}\n".format(datetime.datetime.now()-START_TIME),
+              "Played Games:  {!s}\n".format(GAME_NUM)
+              )
         shutil.rmtree('imgs')
