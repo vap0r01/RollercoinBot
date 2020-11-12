@@ -101,7 +101,7 @@ class Bot2048:
         self.available_moves = ["right", "left", "up", "down"]
         self.game = "2048"
 
-    def gameloop(self):
+    def play(self):
         start_game(self.start_img_path)
         start_game_msg(self.game)
         self.run_game()
@@ -114,11 +114,29 @@ class Bot2048:
                 time.sleep(0.25)
 
 
+class BotCoinFlip:
+    def __init__(self):
+        self.start_img_path = None
+        self.game = "CoinClick"
+
+    def play(self):
+        start_game(self.start_img_path)
+        start_game_msg(self.game)
+        self.run_game()
+        end_game()
+
+    def run_game(self):
+        self.create_array()
+
+    def create_array(self):
+        pass
+
+
 def main():
     global GAME_NUM
     while True:
         GAME_NUM += 1
-        Bot2048().gameloop()
+        Bot2048().play()
         time.sleep(20)
 
 
