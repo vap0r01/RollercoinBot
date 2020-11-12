@@ -15,7 +15,7 @@ START_TIME = datetime.datetime.now()
 
 def screen_grab():
     im = ImageGrab.grab()
-    img_name = os.getcwd() + "\\imgs\\ful_snap__" + str(int(time.time())) + ".png"
+    img_name = os.getcwd() + "\\imgs\\full_snap__" + str(int(time.time())) + ".png"
     im.save(img_name, "PNG")
     return img_name
 
@@ -114,24 +114,6 @@ class Bot2048:
                 time.sleep(0.25)
 
 
-class BotCoinFlip:
-    def __init__(self):
-        self.start_img_path = None
-        self.game = "CoinClick"
-
-    def play(self):
-        start_game(self.start_img_path)
-        start_game_msg(self.game)
-        self.run_game()
-        end_game()
-
-    def run_game(self):
-        self.create_array()
-
-    def create_array(self):
-        pass
-
-
 def main():
     global GAME_NUM
     while True:
@@ -148,10 +130,6 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("Program closed by User!")
-
-    except Exception as e:
-        print("An Error occured. Stopping the code...")
-        print(e)
 
     finally:
         print("\nStatistics:\n",
