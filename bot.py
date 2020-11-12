@@ -15,7 +15,7 @@ START_TIME = datetime.datetime.now()
 
 def screen_grab():
     im = ImageGrab.grab()
-    img_name = os.getcwd() + "\\imgs\\ful_snap__" + str(int(time.time())) + ".png"
+    img_name = os.getcwd() + "\\imgs\\full_snap__" + str(int(time.time())) + ".png"
     im.save(img_name, "PNG")
     return img_name
 
@@ -101,7 +101,7 @@ class Bot2048:
         self.available_moves = ["right", "left", "up", "down"]
         self.game = "2048"
 
-    def gameloop(self):
+    def play(self):
         start_game(self.start_img_path)
         start_game_msg(self.game)
         self.run_game()
@@ -118,7 +118,7 @@ def main():
     global GAME_NUM
     while True:
         GAME_NUM += 1
-        Bot2048().gameloop()
+        Bot2048().play()
         time.sleep(20)
 
 
@@ -130,10 +130,6 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         print("Program closed by User!")
-
-    except Exception as e:
-        print("An Error occured. Stopping the code...")
-        print(e)
 
     finally:
         print("\nStatistics:\n",
