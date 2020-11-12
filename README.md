@@ -9,6 +9,9 @@ IMPORTANT: \
 Use this bot at your own risk. I'm not responsible for anything going wrong! 
 I'm also not responsible if you get blocked by Rollercoin!
 
+Join Rollercoin here: https://rollercoin.com/?r=k9l1af6u
+You will get 1000 Satoshis with the referral code if you sign up.
+
 ## Games
 - 2048
 
@@ -16,7 +19,7 @@ More will be added later
 
 ## Installation
 - Download or clone the git
-- Python 3.6+ needs to be installed
+- Python 3.6+ needs to be installed (python 3.9 currently not supported!)
 - Install all the requirements ```pip install -r requirements.txt```
 - Open up rollercoin.com/game/choose_game on your main monitor
 - Start the script ```python bot.py```
