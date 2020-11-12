@@ -9,6 +9,9 @@ IMPORTANT: \
 Use this bot at your own risk. I'm not responsible for anything going wrong! 
 I'm also not responsible if you get blocked by Rollercoin!
 
+Join Rollercoin here: https://rollercoin.com/?r=k9l1af6u
+You will get 1000 Satoshis with the referral code if you sign up.
+
 ## Games
 - 2048
 
