@@ -63,11 +63,14 @@ def setup():
 
 def start_game(start_img_path):
     click_image(start_img_path)
-    while not check_image("rc_items/start_game.png"):
-        time.sleep(1)
+    time.sleep(2)
+    if not check_image("rc_items/start_game.png"):
+        pyautogui.moveTo(100, 100)
+        return True
     sx, sy = find_image("rc_items/start_game.png", screen_grab())
     mouse_click(sx + 2, sy + 2, wait=0.1)
     time.sleep(3)
+    return False
 
 
 def start_game_msg(name):
@@ -97,7 +100,9 @@ class Bot2048:
         return check_image(self.start_img_path)
 
     def play(self):
-        start_game(self.start_img_path)
+        err = start_game(self.start_img_path)
+        if err:
+            return not err
         start_game_msg(self.game)
         self.run_game()
         end_game()
@@ -121,6 +126,10 @@ class BotCoinFlip:
             "litecoin": [],
             "monero": [],
             "eos": [],
+            "rlt": [],
+            "xrp": [],
+            "xml": [],
+            "tether": [],
         }
         self.coin_images = [
             ("binance", cv2.imread("rc_items/coinflip_item_binance.png")),
@@ -129,18 +138,25 @@ class BotCoinFlip:
             ("litecoin", cv2.imread("rc_items/coinflip_item_litecoin.png")),
             ("monero", cv2.imread("rc_items/coinflip_item_monero.png")),
             ("eos", cv2.imread("rc_items/coinflip_item_eos.png")),
+            ("rlt", cv2.imread("rc_items/coinflip_item_rlt.png")),
+            ("xrp", cv2.imread("rc_items/coinflip_item_xrp.png")),
+            ("xml", cv2.imread("rc_items/coinflip_item_xml.png")),
+            ("tether", cv2.imread("rc_items/coinflip_item_tether.png")),
         ]
 
     def can_start(self):
         return check_image(self.start_img_path)
 
     def play(self):
-        start_game(self.start_img_path)
+        err = start_game(self.start_img_path)
+        if err:
+            return False
         start_game_msg(self.game)
         self.get_coin_fields()
         self.check_coins()
         self.match_coins()
         end_game()
+        return True
 
     def get_coin_fields(self):
         screen = cv2.imread(screen_grab())
@@ -155,7 +171,6 @@ class BotCoinFlip:
             self.coin_pos.append(matches['BBox'][i])
 
     def check_coins(self):
-        print(self.coin_pos)
         ind = 0
         max_index = len(self.coin_pos)
         while ind < max_index:
@@ -183,26 +198,29 @@ class BotCoinFlip:
                 self.coin_items[coin2[0]].append(coin2[1])
 
             ind += 2
-            time.sleep(.5)
 
     def match_coins(self):
         for coin in self.coin_items.values():
-            c1 = coin[0]
-            mouse_click(c1[0] + c1[2] / 2, c1[1] + c1[3] / 2, wait=0.05)
-            c2 = coin[1]
-            mouse_click(c2[0] + c2[2] / 2, c2[1] + c2[3] / 2, wait=0.05)
-            time.sleep(2)
+            if len(coin) == 2:
+                c1 = coin[0]
+                mouse_click(c1[0] + c1[2] / 2, c1[1] + c1[3] / 2, wait=0.05)
+                c2 = coin[1]
+                mouse_click(c2[0] + c2[2] / 2, c2[1] + c2[3] / 2, wait=0.05)
+                time.sleep(1)
 
 
 def main():
-    Bots = [Bot2048, BotCoinFlip]
+    Bots = [
+        Bot2048,
+        BotCoinFlip]
     global GAME_NUM
     while True:
         for bot in Bots:
             if bot().can_start():
-                bot().play()
+                if not bot().play():
+                    continue
                 GAME_NUM += 1
-        time.sleep(5)
+                time.sleep(2)
 
 
 if __name__ == "__main__":
@@ -216,6 +234,6 @@ if __name__ == "__main__":
     finally:
         print("\nStatistics:\n",
               "Time running: {!s}\n".format(datetime.datetime.now()-START_TIME),
-              "Played Games:  {!s}\n".format(GAME_NUM)
+              "Played Games:  {!s}\n".format(GAME_NUM+1)
               )
         shutil.rmtree('imgs')
