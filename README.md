@@ -11,9 +11,11 @@ I'm also not responsible if you get blocked by Rollercoin!
 
 Join Rollercoin here: https://rollercoin.com/?r=k9l1af6u
 You will get 1000 Satoshis with the referral code if you sign up.
+You can also support me just by playing Rollercoin and running my bot, if you signed up with the link above!
 
 ## Games
 - 2048
+- CoinFlip (soon!)
 
 More will be added later
 
