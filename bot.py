@@ -1,29 +1,22 @@
 import os
-import sys
 import random
 import time
 import datetime
 
 import cv2
 import keyboard
-import mouse
 import pyautogui
 import shutil
 from PIL import ImageGrab
-from MTM import matchTemplates, findMatches
+from MTM import matchTemplates
 
 GAME_NUM = 0
 START_TIME = datetime.datetime.now()
 
 
-def mouse_click(x, y, wait=0.1, duration=0):
+def mouse_click(x, y, wait=0.1):
     pyautogui.click(x, y)
-    """
-    m_pos = mouse.get_position()
-    mouse.drag(m_pos[0], m_pos[1], x, y, absolute=True, duration=duration)
     time.sleep(wait)
-    print("Click!")
-    mouse.click("left")"""
 
 
 def screen_grab():
@@ -69,8 +62,6 @@ def setup():
 
 
 def start_game(start_img_path):
-    while not check_image(start_img_path):
-        time.sleep(5)
     click_image(start_img_path)
     while not check_image("rc_items/start_game.png"):
         time.sleep(1)
@@ -89,16 +80,11 @@ def end_game():
     click_image("rc_items/gain_power.png")
 
     keyboard.press_and_release("page up")
-
-    while not check_image("rc_items/choose_game.png") or check_image("rc_items/collect_pc.png"):
-        time.sleep(4)
+    time.sleep(0.5)
+    click_image("rc_items/goto_games.png")
+    time.sleep(0.5)
     if check_image("rc_items/collect_pc.png"):
-        click_image("rc_items/collect_pc.png")
-        print("PC upgraded!")
-        time.sleep(2)
-    while check_image("rc_items/choose_game.png"):
-        click_image("rc_items/choose_game.png")
-        time.sleep(2)
+        click_image("rc_items/click_image")
 
 
 class Bot2048:
@@ -106,6 +92,9 @@ class Bot2048:
         self.start_img_path = "rc_items/2048_gameimg.png"
         self.available_moves = ["right", "left", "up", "down"]
         self.game = "2048"
+
+    def can_start(self):
+        return check_image(self.start_img_path)
 
     def play(self):
         start_game(self.start_img_path)
@@ -125,7 +114,7 @@ class BotCoinFlip:
         self.start_img_path = "rc_items/coinflip_gameimg.png"
         self.game = "CoinFlip"
         self.coin_pos = []
-        self.coin_item = {
+        self.coin_items = {
             "binance": [],
             "btc": [],
             "eth": [],
@@ -142,81 +131,62 @@ class BotCoinFlip:
             ("eos", cv2.imread("rc_items/coinflip_item_eos.png")),
         ]
 
+    def can_start(self):
+        return check_image(self.start_img_path)
+
     def play(self):
-        #start_game(self.start_img_path)
-        #start_game_msg(self.game)
+        start_game(self.start_img_path)
+        start_game_msg(self.game)
         self.get_coin_fields()
         self.check_coins()
         self.match_coins()
-        #end_game()
+        end_game()
 
     def get_coin_fields(self):
+        screen = cv2.imread(screen_grab())
         matches = matchTemplates(
             [("card", cv2.imread("rc_items/coinflip_back.png"))],
-            cv2.imread(screen_grab()),
+            screen,
             N_object=float("inf"),
             score_threshold=0.5,
             #maxOverlap=0.25,
-            searchBox=None)['BBox']
-        for i in range(len(matches)):
-            self.coin_pos.append(matches[i])
+            searchBox=None)
+        for i in range(len(matches['BBox'])):
+            self.coin_pos.append(matches['BBox'][i])
 
     def check_coins(self):
-        print(len(self.coin_pos))
-        pos = 0
-        max_index = len(self.coin_pos)-1
-        while pos < max_index:
-            c1 = self.coin_pos[pos]
-            c1_item = None
-            mouse_click(c1[0], c1[1], wait=0.3, duration=1)
-            match = matchTemplates(
+        print(self.coin_pos)
+        ind = 0
+        max_index = len(self.coin_pos)
+        while ind < max_index:
+            coin1_pos = self.coin_pos[ind]
+            coin2_pos = self.coin_pos[ind+1]
+
+            mouse_click(coin1_pos[0] + coin1_pos[2]/2, coin1_pos[1] + coin1_pos[3]/2, wait=0.1)
+            mouse_click(coin2_pos[0] + coin2_pos[2]/2, coin2_pos[1] + coin2_pos[3]/2, wait=0.3)
+            screen = cv2.imread(screen_grab())
+            matches = matchTemplates(
                 self.coin_images,
-                cv2.imread(screen_grab()),
-                N_object=float("inf"),
-                score_threshold=.1,
+                screen,
+                N_object=2,
+                score_threshold=.7,
                 maxOverlap=.25,
-                searchBox=c1)
-            print(match)
-            if len(match['BBox']) >= 1:
-                c1_item = match["TemplateName"][0]
-                self.coin_item[c1_item].append(c1)
-                break
-            pos += 1
-            time.sleep(.3)
+                searchBox=None)
 
-            c2 = self.coin_pos[pos]
-            c2_item = None
-            mouse_click(c2[0] + c2[2] / 2, c2[1] + c2[3] / 2, wait=0.3, duration=1)
-            match = matchTemplates(
-                self.coin_images,
-                cv2.imread(screen_grab()),
-                N_object=float("inf"),
-                score_threshold=.1,
-                maxOverlap=.25,
-                searchBox=c2)
-            print(match)
-            if len(match['BBox']) >= 1:
-                c2_item = match["TemplateName"][0]
-                self.coin_item[c2_item].append(c2)
-                break
-            pos += 1
-            time.sleep(.3)
+            coin1 = (matches["TemplateName"][0], matches["BBox"][0])
+            coin2 = (matches["TemplateName"][1], matches["BBox"][1])
 
-            if not c1_item:
-                print("An error occurred: No matching coin! C1 missing")
-                #sys.exit()
+            if coin1[0] == coin2[0]:
+                self.coin_items.pop(coin1[0])
+            else:
+                self.coin_items[coin1[0]].append(coin1[1])
+                self.coin_items[coin2[0]].append(coin2[1])
 
-            if not c2_item:
-                print("An error occurred: No matching coin! C2 missing")
-                #sys.exit()
-
-            if c1_item == c2_item and c1_item is not None:
-                self.coin_item.pop(c1_item)
-
+            ind += 2
             time.sleep(.5)
 
     def match_coins(self):
-        for coin in self.coin_item.values():
+        for coin in self.coin_items.values():
             c1 = coin[0]
             mouse_click(c1[0] + c1[2] / 2, c1[1] + c1[3] / 2, wait=0.05)
             c2 = coin[1]
@@ -225,19 +195,20 @@ class BotCoinFlip:
 
 
 def main():
+    Bots = [Bot2048, BotCoinFlip]
     global GAME_NUM
     while True:
-        GAME_NUM += 1
-        BotCoinFlip().play()
-        time.sleep(20)
+        for bot in Bots:
+            if bot().can_start():
+                bot().play()
+                GAME_NUM += 1
+        time.sleep(5)
 
 
 if __name__ == "__main__":
     setup()
     try:
-        bot = BotCoinFlip()
-        bot.play()
-        #main()
+        main()
 
     except KeyboardInterrupt:
         print("Program closed by User!")
@@ -247,4 +218,4 @@ if __name__ == "__main__":
               "Time running: {!s}\n".format(datetime.datetime.now()-START_TIME),
               "Played Games:  {!s}\n".format(GAME_NUM)
               )
-        # shutil.rmtree('imgs')
+        shutil.rmtree('imgs')
