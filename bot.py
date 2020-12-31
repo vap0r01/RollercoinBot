@@ -27,15 +27,18 @@ def screen_grab():
 
 
 def find_image(image_path, root_image_path):
-    image = cv2.imread(image_path)
-    root_image = cv2.imread(root_image_path)
-    method = [cv2.TM_SQDIFF_NORMED, cv2.TM_CCOEFF][0]
-    result = cv2.matchTemplate(image, root_image, method)
-    mn, _, mn_loc, _ = cv2.minMaxLoc(result)
-    if mn > 0.01:
+    matches = matchTemplates(
+        [("img", cv2.imread(image_path))],
+        cv2.imread(root_image_path),
+        N_object=10,
+        score_threshold=0.9,
+        # maxOverlap=0.25,
+        searchBox=None)
+    if len(matches["BBox"]) == 0:
         return None, None
-    mp_x, mp_y = mn_loc
-    return mp_x, mp_y
+    else:
+        box = matches["BBox"][0]
+        return box[0], box[1]
 
 
 def check_image(img):
@@ -74,7 +77,9 @@ def start_game(start_img_path):
 
 
 def start_game_msg(name):
+    global GAME_NUM
     print("Starting Game #{!s}: '{}'@{!s}".format(GAME_NUM, name, datetime.datetime.now().time()))
+    GAME_NUM += 1
 
 
 def end_game():
@@ -111,7 +116,7 @@ class Bot2048:
         while not check_image("rc_items/gain_power.png"):
             for _ in range(4):
                 keyboard.press_and_release(random.choice(self.available_moves))
-                time.sleep(0.25)
+                time.sleep(0.125)
 
 
 class BotCoinFlip:
@@ -217,10 +222,7 @@ def main():
     while True:
         for bot in Bots:
             if bot().can_start():
-                if not bot().play():
-                    continue
-                GAME_NUM += 1
-                time.sleep(2)
+                bot().play()
 
 
 if __name__ == "__main__":
