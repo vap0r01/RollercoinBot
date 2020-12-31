@@ -1,6 +1,6 @@
 opencv-python==4.4.0.44
 keyboard~=0.13.5
-mouse~=0.7.1
 Pillow~=8.0.1
 numpy==1.19.2
 Multi-Template-Matching~=1.6.1
+PyAutoGui==0.9.52
