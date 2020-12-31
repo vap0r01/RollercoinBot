@@ -15,7 +15,7 @@ You can also support me just by playing Rollercoin and running my bot, if you si
 
 ## Games
 - 2048
-- CoinFlip (soon!)
+- CoinFlip
 
 More will be added later
 
@@ -25,9 +25,5 @@ More will be added later
 - Install all the requirements ```pip install -r requirements.txt```
 - Open up rollercoin.com/game/choose_game on your main monitor
 - Start the script ```python bot.py```
-
-
-## Bugs
-- Sometimes it breaks after playing a game
 
 If you find any bugs during execution, open up an issue here on github
